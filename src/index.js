@@ -11,28 +11,19 @@ const userRoutes = require('./routes/user');
 const data = require('./data/data.json');
 
 
+mongoose.connect('mongodb://localhost:27017/apidb')
+  .then(function() {
+      console.log('db connection successful');
+      seeder.seed(data).then(function(dbData) {
+          console.log('db has been seeded')
+      }).catch(function(err) {
+          console.log(err);
+      });
+  }, function(err) {
+      console.error('connection error:', err);
+  });
 
-// Establish connection to Mongo database and set port as well as database.
-mongoose.Promise = global.Promise;
-mongoose.connect("mongodb://localhost:27017/CourseRating", {useMongoClient: true});
 var db = mongoose.connection;
-db.on('error', function(err) {
-	console.log(err);
-})
-
-
-// Upon connection seed data from the /data/data.json file into the Mongo
-db.on('open', function() {
-	seeder.seed(data)
-	.then(function(dbData) {} )
-	.catch(function(err) {
-		console.log(err);
-	});
-	console.log("Successfully connected to Mongo database.");
-})
-
-
-
 
 app.use('/api/users', userRoutes);
 app.use('/api/courses', courseRoutes);
@@ -47,23 +38,22 @@ app.use('/', express.static('public'));
 
 
 app.use(function(req, res, next) {
-	var err = new Error('Not Found');
+	var err = new Error();
+	err.message = 'File Not Found';
 	err.status = 404;
 	next(err);
-})
+  });
 
-//ecpress global error handler
+//express global error handler
 app.use(function(err, req, res, next) {
 	res.status(err.status || 500);
-	res.json({
-		error: {
-			message: err.message
-		}
-	});
-})
+	res.json(err);
+  });
 
 // Begin listenserver on port.
 
 app.listen(app.get('port'), function() {
   	console.log('Server is now running at http://localhost:5000.');
 })
+
+module.exports = {app};
