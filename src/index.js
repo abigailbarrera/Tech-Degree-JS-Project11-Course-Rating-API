@@ -47,8 +47,12 @@ app.use(function(req, res, next) {
 //express global error handler
 app.use(function(err, req, res, next) {
 	res.status(err.status || 500);
-	res.json(err);
-  });
+	res.json({
+		error: {
+			message: err.message
+		}
+	});
+})
 
 // Begin listenserver on port.
 
