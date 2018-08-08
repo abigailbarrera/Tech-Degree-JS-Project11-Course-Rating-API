@@ -10,7 +10,7 @@ router.use(bodyParser.json());
 
 // This will return the currently authenticated user. Authentication
 
-router.get('/users', mid.authentication, function(req, res, next) {
+router.get('/', mid.authentication, function(req, res, next) {
     res.status(200);
     res.json(req.authenticatedUser);
 });
@@ -18,7 +18,7 @@ router.get('/users', mid.authentication, function(req, res, next) {
 
 // This will add a new user to the database using the POST method before
 
-router.post('/users', function(req, res, next) {
+router.post('/', function(req, res, next) {
 	User.findOne({ emailAddress: req.body.emailAddress })
 		.exec(function(error, user) {
 		  if(error) return next(error);
